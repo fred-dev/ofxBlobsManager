@@ -8,19 +8,35 @@
 
 ofxBlobsManager::ofxBlobsManager()
 {
-	maxMergeDis = 100; 
-	normalizePercentage = 1;	
-	
-	enableMinDetectedTimeFilter = true;
-	minDetectedTime = 500;
-	
-	enableUndetectedBlobs = true;
-	maxUndetectedTime = 500;
-	
-	giveLowestPossibleIDs = false;
-	maxNumBlobs = 9999;
-	
-	debugDrawCandidates = false;
+    params.add(maxMergeDis.set("maxMergeDis", 100, 1, 2000));
+    maxMergeDis.addListener(this, &ofxBlobsManager::mergeDisCallback);
+    
+    params.add(normalizePercentage.set("normalizePercentage", 1, 0, 100));
+    normalizePercentage.addListener(this, &ofxBlobsManager::normalizePercentageCallback);
+    
+    params.add(enableMinDetectedTimeFilter.set("enableMinDetectedTimeFilter", true));
+    enableMinDetectedTimeFilter.addListener(this, &ofxBlobsManager::useMinDetectedTimeFilterCallack);
+    
+    params.add(minDetectedTime.set("minDetectedTime", 500, 1, 2500));
+    minDetectedTime.addListener(this, &ofxBlobsManager::minDetectedTimeChangeCalback);
+    
+    params.add(enableUndetectedBlobs.set("enableUndetectedBlobs", false));
+    enableUndetectedBlobs.addListener(this, &ofxBlobsManager::enableUndetectedBlobsCallback);
+    
+    params.add(maxUndetectedTime.set("maxUndetectedTime", 500, 1, 2500));
+    maxUndetectedTime.addListener(this, &ofxBlobsManager::maxundetectedTimeChangeCallback);
+
+
+    params.add(giveLowestPossibleIDs.set("giveLowestPossibleIDs", false));
+    giveLowestPossibleIDs.addListener(this, &ofxBlobsManager::giveLowestIDChangedCallback);
+    
+    params.add(maxNumBlobs.set("maxNumBlobs", 100, 1, 9999));
+    maxNumBlobs.addListener(this, &ofxBlobsManager::maxNumberBLobsChangedCallback);
+
+
+    params.add(debugDrawCandidates.set("debugDrawCandidates", false));
+    debugDrawCandidates.addListener(this, &ofxBlobsManager::debugDrawCandidatesChangedCallback);
+
 	
 	sequentialID = 0;
 	sequentialCandidateID = 0;
@@ -124,7 +140,7 @@ void ofxBlobsManager::update(vector<ofxCvBlob>& newBlobs)
 			int undetectedTime = currentTime-candidateBlob.lastDetectedTime;
 			int detectionTime = candidateBlob.lastDetectedTime-candidateBlob.iniDetectedTime;
 			//cout << "    candidateBlob: " << candidateBlob << " detectionTime: " << detectionTime << " undetectedTime: " << undetectedTime << endl; 
-			int maxUndetectedTime = (enableUndetectedBlobs)? this->maxUndetectedTime : 0;
+			int maxUndetectedTime = (enableUndetectedBlobs)? this->maxUndetectedTime.get() : 0;
 			if(undetectedTime > maxUndetectedTime)
 			{
 				//cout << "      to long undetected" << endl;
@@ -157,7 +173,7 @@ void ofxBlobsManager::update(vector<ofxCvBlob>& newBlobs)
 		ofxStoredBlobVO& blob = blobs.at(i);
 		int undetectedTime = currentTime-blob.lastDetectedTime;
 		//cout << "    blob: " << blob->id << " undetectedTime: " << undetectedTime << endl; 
-		int maxUndetectedTime = (enableUndetectedBlobs)? this->maxUndetectedTime : 0;
+		int maxUndetectedTime = (enableUndetectedBlobs)? this->maxUndetectedTime.get() : 0;
 		//cout << "    this->maxUndetectedTime: " << this->maxUndetectedTime << endl;
 		//cout << "    local maxUndetectedTime: " << maxUndetectedTime << endl;
 		if(undetectedTime > maxUndetectedTime)
@@ -210,7 +226,7 @@ vector<ofxStoredBlobVO*> ofxBlobsManager::findCloseBlobs(ofxCvBlob& newBlob,vect
 	for( int j = 0; j < numBlobs; j++ ) 
 	{
 		ofxStoredBlobVO& blob = blobs.at(j);
-		blob.dis = blob.centroid.distance(newBlob.centroid);
+		blob.dis = ofVec2f (blob.centroid).distance(ofVec2f (newBlob.centroid));
 		
 		//cout << "      " << blob->id << ": dis: " << blob->dis << endl;
 		if(blob.dis < maxMergeDis)
@@ -251,7 +267,7 @@ void ofxBlobsManager::debugDraw(int baseX, int baseY, int inputWidth, int inputH
 	float scaleX = float(displayWidth)/float(inputWidth);
 	float scaleY = float(displayHeight)/float(inputHeight);
 	
-	//ofEnableAlphaBlending();
+	ofEnableAlphaBlending();
 	//ofSetHexColor(0x0036B7);
 	int numBlobs = blobs.size();
 	for( int i = 0; i < numBlobs; i++ ) 
@@ -263,7 +279,7 @@ void ofxBlobsManager::debugDraw(int baseX, int baseY, int inputWidth, int inputH
 		
 		ofFill();
 		ofSetHexColor(0x00ffff);
-		ofCircle(x, y, 10);
+		ofDrawCircle(x, y, 10);
 
 		ofSetHexColor(0x000000);
 		if(blob.id >= 10) x -= 4;
@@ -283,7 +299,7 @@ void ofxBlobsManager::debugDraw(int baseX, int baseY, int inputWidth, int inputH
 			
 			ofFill();
 			ofSetColor(0,255,255,125);
-			ofCircle(x, y, 10);
+			ofDrawCircle(x, y, 10);
 			
 			ofSetHexColor(0x000000);
 			if(candidateBlob.id >= 10) x -= 4;
@@ -291,4 +307,42 @@ void ofxBlobsManager::debugDraw(int baseX, int baseY, int inputWidth, int inputH
 		}
 		ofDisableAlphaBlending();
 	}	
+}
+
+void ofxBlobsManager::mergeDisCallback(int & mergeDistanceChanged){
+    maxMergeDis = mergeDistanceChanged;
+    cout << "Max Merge Dis changed is now : " + ofToString(maxMergeDis);
+}
+
+void ofxBlobsManager::normalizePercentageCallback( float & normalisePercentageChanged){
+    normalizePercentage =normalisePercentageChanged;
+}
+
+void ofxBlobsManager::useMinDetectedTimeFilterCallack(bool & useMinDetectedTimeChanged){
+    enableMinDetectedTimeFilter = useMinDetectedTimeChanged;
+}
+
+
+void ofxBlobsManager::minDetectedTimeChangeCalback(int & minDetectedTimeChanged){
+    minDetectedTime = minDetectedTimeChanged;
+}
+
+void ofxBlobsManager::enableUndetectedBlobsCallback(bool & enableUndetectedBlobsChanged){
+    enableUndetectedBlobs = enableUndetectedBlobsChanged;
+}
+
+void ofxBlobsManager::maxundetectedTimeChangeCallback(int & maxUndetectedTimeChanged){
+    maxUndetectedTime = maxUndetectedTimeChanged;
+}
+
+void ofxBlobsManager::giveLowestIDChangedCallback(bool & giveLowestIDChanged){
+   giveLowestPossibleIDs = giveLowestIDChanged;
+}
+
+void ofxBlobsManager::maxNumberBLobsChangedCallback(int & maxNumBlobsChanged){
+    maxNumBlobs = maxNumBlobsChanged;
+}
+
+void ofxBlobsManager::debugDrawCandidatesChangedCallback(bool & debugDrawCandidatesChanged){
+    debugDrawCandidates =  debugDrawCandidatesChanged;
 }

@@ -1,0 +1,37 @@
+<?xml version="1.0"?>
+<group>
+	<group>
+		<maxMergeDis>100</maxMergeDis>
+		<normalizePercentage>1</normalizePercentage>
+		<enableMinDetectedTimeFilter>1</enableMinDetectedTimeFilter>
+		<minDetectedTime>500</minDetectedTime>
+		<enableUndetectedBlobs>0</enableUndetectedBlobs>
+		<maxUndetectedTime>500</maxUndetectedTime>
+		<giveLowestPossibleIDs>0</giveLowestPossibleIDs>
+		<maxNumBlobs>100</maxNumBlobs>
+		<debugDrawCandidates>0</debugDrawCandidates>
+	</group>
+	<learn_background>0</learn_background>
+	<threshold>26</threshold>
+</group>
+<Blob_manager>
+	<group>
+		<maxMergeDis>52</maxMergeDis>
+		<normalizePercentage>29.6237</normalizePercentage>
+		<enableMinDetectedTimeFilter>1</enableMinDetectedTimeFilter>
+		<minDetectedTime>286</minDetectedTime>
+		<enableUndetectedBlobs>1</enableUndetectedBlobs>
+		<maxUndetectedTime>346</maxUndetectedTime>
+		<giveLowestPossibleIDs>1</giveLowestPossibleIDs>
+		<maxNumBlobs>100</maxNumBlobs>
+		<debugDrawCandidates>0</debugDrawCandidates>
+	</group>
+	<learn_background>0</learn_background>
+	<threshold>29</threshold>
+	<minArea>10584</minArea>
+	<maxArea>691200</maxArea>
+	<nConsidered>8</nConsidered>
+	<bFindHoles>0</bFindHoles>
+	<bUseApproximation>1</bUseApproximation>
+	<blur>57</blur>
+</Blob_manager>
