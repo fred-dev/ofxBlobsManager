@@ -14,7 +14,7 @@ void ofApp::setup(){
     width = vidPlayer.getWidth();
     height = vidPlayer.getHeight();
 	#endif
-    drawWidth = 384;
+    drawWidth = 400;
     
     drawHeight = drawWidth / width * height;
 
@@ -32,21 +32,26 @@ void ofApp::setup(){
     bFindHoles.set("bFindHoles", true);
     bUseApproximation.set("bUseApproximation", true);
     
-    panel.setup("Blob manager", "settings.xml", 10, 100);
+    openCVParameters.add(bLearnBakground);
+    openCVParameters.add(threshold);
+    openCVParameters.add(blur);
+    openCVParameters.add(minArea);
+    openCVParameters.add(maxArea);
+    openCVParameters.add(nConsidered);
+    openCVParameters.add(bFindHoles);
+    openCVParameters.add(bUseApproximation);
+    openCVParameters.setName("Open CV Parameters");
+    
+    panel.setup("Blobs manager", "settings.xml", 10, 100);
     panel.add(blobsManager.params);
-    panel.add(bLearnBakground);
-    panel.add(threshold);
-    panel.add(blur);
-    panel.add(minArea);
-    panel.add(maxArea);
-    panel.add(nConsidered);
-    panel.add(bFindHoles);
-    panel.add(bUseApproximation);
+    panel.add(openCVParameters);
+    
     panel.loadFromFile("settings.xml");
     panel.setPosition(drawWidth * 2 + 50, 20);
     
     ofSetBackgroundColor(0, 0, 0);
 	ofSetFrameRate(30);
+    ofSetLogLevel(OF_LOG_VERBOSE);
 }
 
 //--------------------------------------------------------------
@@ -188,6 +193,11 @@ void ofApp::keyPressed(int key){
 		case ' ':
 			bLearnBakground = true;
 			break;
+        case 's':
+#ifndef _USE_LIVE_VIDEO
+            vidPlayer.setFrame(0);
+#endif
+            break;
 	}
 }
 

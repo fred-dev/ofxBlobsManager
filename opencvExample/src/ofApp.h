@@ -42,9 +42,9 @@ class ofApp : public ofBaseApp{
 		
 		ofxBlobsManager		blobsManager;
 	
+        ofParameterGroup openCVParameters;
 		ofParameter<int> 				threshold;
 		ofParameter<bool>				bLearnBakground;
-    
         ofParameter<int> blur;
         ofParameter<int> minArea;
         ofParameter<int> maxArea;

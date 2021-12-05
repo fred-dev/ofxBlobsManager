@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<Blobs_manager>
+	<Blob_manager_parameters>
+		<maxMergeDis>100</maxMergeDis>
+		<normalizePercentage>1</normalizePercentage>
+		<enableMinDetectedTimeFilter>1</enableMinDetectedTimeFilter>
+		<minDetectedTime>256</minDetectedTime>
+		<enableUndetectedBlobs>1</enableUndetectedBlobs>
+		<maxUndetectedTime>485</maxUndetectedTime>
+		<giveLowestPossibleIDs>1</giveLowestPossibleIDs>
+		<maxNumBlobs>100</maxNumBlobs>
+		<debugDrawCandidates>0</debugDrawCandidates>
+	</Blob_manager_parameters>
+	<Open_CV_Parameters>
+		<learn_background>1</learn_background>
+		<threshold>20</threshold>
+		<blur>5</blur>
+		<minArea>165747</minArea>
+		<maxArea>331494</maxArea>
+		<nConsidered>10</nConsidered>
+		<bFindHoles>1</bFindHoles>
+		<bUseApproximation>1</bUseApproximation>
+		<Track_Hue_Saturation>0</Track_Hue_Saturation>
+	</Open_CV_Parameters>
+</Blobs_manager>

@@ -1,0 +1,4 @@
+ofxBlobsManager
+ofxOpenCv
+ofxCv
+ofxGui
