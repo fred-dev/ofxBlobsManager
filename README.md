@@ -1,6 +1,9 @@
 BlobsManager
 ============
 
+> **About this fork:** Fork of [peteruithoven/ofxBlobsManager](https://github.com/peteruithoven/ofxBlobsManager) with small fixes to build on OF 0.10 and 0.11.
+
+
 *Looking for new maintainer*
 
 A manager for openCV blobs. 
