@@ -5,7 +5,7 @@ void ofApp::setup(){
     
 	#ifdef _USE_LIVE_VIDEO
     vidGrabber.setDeviceID(0);
-    vidGrabber.initGrabber(1280, 720);
+    vidGrabber.setup(1280, 720);
     width = vidGrabber.getWidth();
     height = vidGrabber.getHeight();
 	#else
@@ -15,6 +15,7 @@ void ofApp::setup(){
     height = vidPlayer.getHeight();
 	#endif
     drawWidth = 400;
+    blobsManager.setBounds(width, height);
     
     drawHeight = drawWidth / width * height;
 
@@ -51,7 +52,7 @@ void ofApp::setup(){
     
     ofSetBackgroundColor(0, 0, 0);
 	ofSetFrameRate(30);
-    ofSetLogLevel(OF_LOG_VERBOSE);
+    ofSetLogLevel(OF_LOG_NOTICE);   // OF_LOG_VERBOSE to see every match, merge and split
 }
 
 //--------------------------------------------------------------
@@ -89,9 +90,10 @@ void ofApp::update(){
 		// find contours which are between the size of 20 pixels and 1/3 the w*h pixels.
 		// also, find holes is set to true so we will get interior contours as well....
 		contourFinder.findContours(grayDiff, minArea, maxArea, nConsidered, bFindHoles, bUseApproximation);	// find holes
+		
+		// only once per new frame, the manager works out velocities from the time between updates
+		blobsManager.update(contourFinder.blobs);
 	}
-	
-	blobsManager.update(contourFinder.blobs);
 	
 }
 
@@ -146,33 +148,38 @@ void ofApp::draw(){
 	// debug draw the filtered blobs
 	blobsManager.debugDraw(drawWidth + 40 , drawHeight + 40, width, height, drawWidth, drawHeight);
 	
+	// the tracked blobs over the video: filled = seen, ring = merged with another blob,
+	// faint ring = missing, its position predicted from its velocity
+	float scale = drawWidth/width;
 	for(int i=0;i<blobsManager.blobs.size();i++)
 	{
-        ofPushView();
-        ofTranslate(20, 20);
-		ofxCvBlob blob = blobsManager.blobs.at(i);
-        ofPushStyle();
+		ofxStoredBlobVO& blob = blobsManager.blobs.at(i);
+		glm::vec2 pos = blob.undetected ? blob.predicted : glm::vec2(blob.centroid.x, blob.centroid.y);
+		float x = 20 + pos.x*scale;
+		float y = 20 + pos.y*scale;
+		ofColor color = ofxBlobsManager::getColor(blob.id);
+		ofPushStyle();
 		ofNoFill();
-		ofSetColor(0,255,0);
-        ofScale(drawWidth/width, drawWidth/width);
-        ofDrawCircle(blob.centroid.x,blob.centroid.y,40);
-        ofPopStyle();
-        ofPopView();
+		ofSetLineWidth(2);
+		ofSetColor(color, blob.undetected ? 100 : 255);
+		ofDrawCircle(x, y, blob.merged ? 24 : 16);
+		ofDrawLine(x, y, x + blob.velocity.x*0.5*scale, y + blob.velocity.y*0.5*scale);
+		string state = blob.merged ? " merged" : (blob.undetected ? " missing" : "");
+		ofDrawBitmapStringHighlight(ofToString(blob.id) + state, x + 18, y - 18, ofColor(0, 180), color);
+		ofPopStyle();
 	}
 	
-	
-	for(int i=0;i<blobsManager.candidateBlobs.size();i++)
+	if(blobsManager.debugDrawCandidates)
 	{
-		ofxCvBlob candidateBlob = blobsManager.candidateBlobs.at(i);
-        ofPushView();
-        ofTranslate(20, 20);
-        ofPushStyle();
-		ofNoFill();
-		ofSetColor(255,0,0);
-        ofScale(drawWidth/width, drawWidth/width);
-        ofDrawCircle(candidateBlob.centroid.x,candidateBlob.centroid.y,40);
-        ofPopStyle();
-        ofPopView();
+		for(int i=0;i<blobsManager.candidateBlobs.size();i++)
+		{
+			ofxCvBlob& candidateBlob = blobsManager.candidateBlobs.at(i);
+			ofPushStyle();
+			ofNoFill();
+			ofSetColor(128);
+			ofDrawCircle(20 + candidateBlob.centroid.x*scale, 20 + candidateBlob.centroid.y*scale, 8);
+			ofPopStyle();
+		}
 	}
 	
 	
@@ -180,8 +187,8 @@ void ofApp::draw(){
     
 	ofSetHexColor(0xffffff);
 	char reportStr[1024];
-	sprintf(reportStr, "bg subtraction and blob detection\npress ' ' to capture bg\nnum blobs found %i\nfps: %f", contourFinder.nBlobs, ofGetFrameRate());
-	ofDrawBitmapString(reportStr, 20, 600);
+	snprintf(reportStr, sizeof(reportStr), "bg subtraction and blob detection\npress ' ' to capture bg, 's' to restart the video\ncontours found %i, blobs tracked %i\nfps: %f", contourFinder.nBlobs, (int)blobsManager.blobs.size(), ofGetFrameRate());
+	ofDrawBitmapString(reportStr, 20, drawHeight*2 + 80);
 
     panel.draw();
 }

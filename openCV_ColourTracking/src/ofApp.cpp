@@ -17,6 +17,7 @@ void ofApp::setup(){
     height = vidPlayer.getHeight();
     #endif
     drawWidth = 400;
+    blobsManager.setBounds(width, height);
     
     drawHeight = drawWidth / width * height;
 

@@ -1,24 +1,31 @@
 <?xml version="1.0"?>
 <Blobs_manager>
 	<Blob_manager_parameters>
-		<maxMergeDis>1102</maxMergeDis>
-		<normalizePercentage>19.898</normalizePercentage>
+		<maxMergeDis>80</maxMergeDis>
+		<normalizePercentage>0.8</normalizePercentage>
+		<velocitySmoothing>0.3</velocitySmoothing>
 		<enableMinDetectedTimeFilter>1</enableMinDetectedTimeFilter>
-		<minDetectedTime>664</minDetectedTime>
+		<minDetectedTime>300</minDetectedTime>
 		<enableUndetectedBlobs>1</enableUndetectedBlobs>
-		<maxUndetectedTime>370</maxUndetectedTime>
+		<maxUndetectedTime>700</maxUndetectedTime>
+		<maxUndetectedTimeAtEdge>1500</maxUndetectedTimeAtEdge>
+		<edgeMargin>10</edgeMargin>
+		<undetectedMomentum>0.3</undetectedMomentum>
+		<enableMergeTracking>1</enableMergeTracking>
+		<mergeMargin>20</mergeMargin>
+		<maxMergedTime>10000</maxMergedTime>
 		<giveLowestPossibleIDs>0</giveLowestPossibleIDs>
 		<maxNumBlobs>100</maxNumBlobs>
-		<debugDrawCandidates>0</debugDrawCandidates>
+		<debugDrawCandidates>1</debugDrawCandidates>
 	</Blob_manager_parameters>
 	<Open_CV_Parameters>
 		<learn_background>0</learn_background>
-		<threshold>10</threshold>
+		<threshold>61</threshold>
 		<blur>55</blur>
-		<minArea>1</minArea>
-		<maxArea>691200</maxArea>
+		<minArea>817</minArea>
+		<maxArea>20409</maxArea>
 		<nConsidered>10</nConsidered>
 		<bFindHoles>0</bFindHoles>
-		<bUseApproximation>1</bUseApproximation>
+		<bUseApproximation>0</bUseApproximation>
 	</Open_CV_Parameters>
 </Blobs_manager>
